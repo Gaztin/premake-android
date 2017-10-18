@@ -45,7 +45,6 @@ p.override(v, "platformToolset", function(base, cfg)
 		base(cfg)
 	end
 end)
-end)
 
 --
 -- Element functions
