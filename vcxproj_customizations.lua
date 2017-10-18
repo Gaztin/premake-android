@@ -22,20 +22,29 @@ end)
 --
 
 p.override(e, "globals", function(base, prj)
-	return table.join(base(prj), {
-		m.keyword,
-		m.defaultLanguage,
-		m.applicationType,
-		m.applicationTypeRevision,
-	})
+	if prj.system == m._ANDROID then
+		return table.join(base(prj), {
+			m.keyword,
+			m.defaultLanguage,
+			m.applicationType,
+			m.applicationTypeRevision,
+		})
+	else
+		base(prj)
+	end
 end)
 
 --
--- Platform toolset
+-- Configuration
 --
 
 p.override(v, "platformToolset", function(base, cfg)
-	v.element("PlatformToolset", nil, "Clang_3_8")
+	if cfg.system == m._ANDROID then
+		v.element("PlatformToolset", nil, "Clang_3_8")
+	else
+		base(cfg)
+	end
+end)
 end)
 
 --
