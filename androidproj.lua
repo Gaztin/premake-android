@@ -113,7 +113,6 @@ end
 m.elements.configurationProperties = function(cfg)
 	return {
 		m.configurationType,
-		v.useDebugLibraries,
 	}
 end
 
