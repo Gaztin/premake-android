@@ -25,6 +25,7 @@ p.override(e, "globals", function(base, prj)
 	if prj.system == m._ANDROID then
 		return table.join(base(prj), {
 			m.keyword,
+			m.rootNamespace,
 			m.defaultLanguage,
 			m.applicationType,
 			m.applicationTypeRevision,
@@ -89,6 +90,12 @@ end)
 function m.keyword(prj)
 	if prj.system == m._ANDROID then
 		v.element("Keyword", nil, "Android")
+	end
+end
+
+function m.rootNamespace(prj)
+	if prj.system == m._ANDROID then
+		v.element("RootNamespace", nil, prj.name)
 	end
 end
 

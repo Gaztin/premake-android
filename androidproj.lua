@@ -66,6 +66,7 @@ end
 
 m.elements.globals = function(prj)
 	return {
+		m.rootNamespace,
 		m.minimalVisualStudioVersion,
 		m.projectVersion,
 		m.projectGuid,
@@ -76,6 +77,10 @@ function m.globals(prj)
 	v.propertyGroup(nil, "Globals")
 	p.callArray(m.elements.globals, prj)
 	p.pop('</PropertyGroup>')
+end
+
+function m.rootNamespace(prj)
+	v.element("RootNamespace", nil, prj.name)
 end
 
 function m.minimalVisualStudioVersion(prj)
