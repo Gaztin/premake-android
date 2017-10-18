@@ -46,6 +46,42 @@ p.override(v, "platformToolset", function(base, cfg)
 	end
 end)
 
+p.override(v, "windowsSDKDesktopARMSupport", function(base, cfg)
+	if cfg.system ~= m._ANDROID then
+		base(cfg)
+	end
+end)
+
+p.override(v, "outputPropertiesGroup", function(base, cfg)
+	if cfg.system ~= m._ANDROID then
+		base(cfg)
+	end
+end)
+
+p.override(v, "debugInformationFormat", function(base, cfg)
+	if cfg.system ~= m._ANDROID then
+		base(cfg)
+	end
+end)
+
+p.override(v, "subSystem", function(base, cfg)
+	if cfg.system ~= m._ANDROID then
+		base(cfg)
+	end
+end)
+
+p.override(v, "importLibrary", function(base, cfg)
+	if cfg.system ~= m._ANDROID then
+		base(cfg)
+	end
+end)
+
+p.override(v, "generateDebugInformation", function(base, cfg)
+	if cfg.system ~= m._ANDROID then
+		base(cfg)
+	end
+end)
+
 --
 -- Element functions
 --
