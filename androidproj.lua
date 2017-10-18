@@ -171,8 +171,12 @@ end
 function m.files(prj)
 	p.push("<ItemGroup>")
 	p.w("<Content Include=\"res\\values\\strings.xml\" />")
-	p.w("<AntBuildXml Include=\"build.xml\" />")
-    p.w("<AndroidManifest Include=\"AndroidManifest.xml\" />")
+	p.push("<AntBuildXml Include=\"build.xml\">")
+	p.w("<SubType>Designer</SubType>");
+	p.pop("</AntBuildXml>")
+    p.push("<AndroidManifest Include=\"AndroidManifest.xml\">")
+	p.w("<SubType>Designer</SubType>");
+    p.pop("</AndroidManifest>")
     p.w("<AntProjectPropertiesFile Include=\"project.properties\" />")
 	p.pop("</ItemGroup>")
 end
