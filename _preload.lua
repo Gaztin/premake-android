@@ -5,6 +5,7 @@ local p = premake
 --
 
 p.api.addAllowed("system", "android")
+p.api.addAllowed("architecture", "ARM64")
 
 --
 -- When to load module
