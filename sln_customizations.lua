@@ -23,3 +23,36 @@ p.override(v, "projects", function(base, wks)
 		end
 	end
 end)
+
+--
+-- Project configuration platforms
+--
+
+p.override(v.elements, "projectConfigurationPlatforms", function(base, cfg, context)
+	if context.prj.system == m._ANDROID then
+		return {
+			m.activeCfg,
+			m.build0,
+			m.deploy0,
+		}
+	else
+		return base(cfg, context)
+	end
+end)
+
+function m.activeCfg(cfg, context)
+	local androidprojuuid = os.uuid(context.prj.name .. m._PACKAGING)
+	p.w("{%s}.%s.ActiveCfg = %s|%s", context.prj.uuid, context.descriptor, context.platform, context.architecture)
+	p.w("{%s}.%s.ActiveCfg = %s|%s", androidprojuuid, context.descriptor, context.platform, context.architecture)
+end
+
+function m.build0(cfg, context)
+	local androidprojuuid = os.uuid(context.prj.name .. m._PACKAGING)
+	p.w("{%s}.%s.Build.0 = %s|%s", context.prj.uuid, context.descriptor, context.platform, context.architecture)
+	p.w("{%s}.%s.Build.0 = %s|%s", androidprojuuid, context.descriptor, context.platform, context.architecture)
+end
+
+function m.deploy0(cfg, context)
+	local androidprojuuid = os.uuid(context.prj.name .. m._PACKAGING)
+	p.w("{%s}.%s.Deploy.0 = %s|%s", androidprojuuid, context.descriptor, context.platform, context.architecture)
+end
