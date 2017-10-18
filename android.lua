@@ -13,6 +13,9 @@ include "_preload.lua"
 
 -- Packaging
 include "androidproj.lua"
+
+-- Application
+include "sln_customizations.lua"
 include "vcxproj_customizations.lua"
 
 return m
