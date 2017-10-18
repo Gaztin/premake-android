@@ -4,4 +4,5 @@ return
 	"androidproj.lua",
 	"sln_customizations.lua",
 	"vcxproj_customizations.lua",
+	"vstudio_customizations.lua",
 }
