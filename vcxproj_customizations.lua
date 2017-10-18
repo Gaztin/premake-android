@@ -6,6 +6,18 @@ local v = p.vstudio.vc2010
 local e = v.elements
 
 --
+-- Generate project
+--
+
+p.override(p.vstudio.vs2010, "generateProject", function(base, prj)
+	base(prj)
+
+	if prj.system == m._ANDROID then
+		p.generate(prj, m._PACKAGING .. ".androidproj", m.androidproj.generate)
+	end
+end)
+
+--
 -- Globals
 --
 
