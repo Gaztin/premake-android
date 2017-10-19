@@ -12,7 +12,7 @@ p.override(v, "projects", function(base, wks)
 	base(wks)
 
 	for prj in p.workspace.eachproject(wks) do
-		if prj.system == m._ANDROID then
+		if prj.system == m._ANDROID and m.isApp(prj.kind) then
 			local prjname = prj.name .. m._PACKAGING
 			local prjpath = prj.location .. "/" .. prjname .. ".androidproj"
 			local prjuuid = os.uuid(prjname)
@@ -29,7 +29,7 @@ end)
 --
 
 p.override(v.elements, "projectConfigurationPlatforms", function(base, cfg, context)
-	if context.prj.system == m._ANDROID then
+	if context.prj.system == m._ANDROID and m.isApp(context.prj.kind) then
 		return {
 			m.activeCfg,
 			m.build0,
