@@ -39,6 +39,14 @@ end)
 -- Configuration
 --
 
+p.override(v, "configurationType", function(base, cfg)
+	if cfg.system == m._ANDROID and m.isApp(cfg.kind) then
+		v.element("ConfigurationType", nil, "DynamicLibrary")
+	else
+		base(cfg)
+	end
+end)
+
 p.override(v, "platformToolset", function(base, cfg)
 	if cfg.system == m._ANDROID then
 		v.element("PlatformToolset", nil, "Clang_3_8")
