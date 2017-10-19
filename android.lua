@@ -6,6 +6,14 @@ m._ANDROID = "android"
 m._PACKAGING = ".Packaging"
 
 --
+-- Utility functions
+--
+
+function m.isApp(kind)
+	return kind == "ConsoleApp" or kind == "WindowedApp"
+end
+
+--
 -- Include components
 --
 
