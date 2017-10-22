@@ -14,7 +14,7 @@ workspace "Workspace"
 	}
 
 project "Application"
-	kind "SharedLib"
+	kind "ConsoleApp"
 	system "android"
 	files {
 		"src/**.h",
@@ -27,5 +27,4 @@ project "Application"
 
 ## Notes
 * Specify `system "android"` in your project to activate the module.
-* Applications must be dynamic libraries ("SharedLib").
 * Make sure you run the "Application.Packaging" project to deploy and debug your application.
