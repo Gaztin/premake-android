@@ -24,6 +24,7 @@ m.elements.project = function(prj)
 		m.importLanguageSettings,
 		v.importExtensionSettings,
 		v.userMacros,
+		v.outputPropertiesGroup,
 		m.itemDefinitionGroups,
 		v.assemblyReferences,
 		m.files,
