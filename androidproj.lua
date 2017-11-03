@@ -24,7 +24,7 @@ m.elements.project = function(prj)
 		m.importLanguageSettings,
 		v.importExtensionSettings,
 		v.userMacros,
-		v.outputPropertiesGroup,
+		m.outputPropertiesGroup,
 		m.itemDefinitionGroups,
 		v.assemblyReferences,
 		m.files,
@@ -139,6 +139,48 @@ end
 
 function m.importLanguageSettings(prj)
 	p.w("<Import Project=\"$(AndroidTargetsPath)\\Android.props\" />")
+end
+
+--
+-- Output properties group
+--
+
+m.elements.outputProperties = function(cfg)
+	return {
+		m.outDir,
+		v.intDir,
+		m.targetName,
+		m.targetExt,
+	}
+end
+
+function m.outputProperties(cfg)
+	v.propertyGroup(cfg)
+	p.callArray(m.elements.outputProperties, cfg)
+	p.pop('</PropertyGroup>')
+end
+
+function m.outputPropertiesGroup(prj)
+	for cfg in p.project.eachconfig(prj) do
+		m.outputProperties(cfg)
+	end
+end
+
+function m.outDir(cfg)
+	local outdir = p.vstudio.path(cfg, cfg.buildtarget.directory)
+	if outdir:sub(1, 1) == "$" then
+		v.element("OutDir", nil, "%s\\", outdir)
+	else
+		v.element("OutDir", nil, "$(ProjectDir)%s\\", outdir)
+	end
+end
+
+function m.targetName(cfg)
+	v.element("TargetName", nil, "$(RootNamespace)")
+end
+
+function m.targetExt(cfg)
+	v.element("TargetExt", nil, ".apk")
 end
 
 --

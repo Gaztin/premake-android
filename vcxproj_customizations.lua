@@ -61,6 +61,24 @@ p.override(v, "windowsSDKDesktopARMSupport", function(base, cfg)
 	end
 end)
 
+p.override(v, "targetName", function(base, cfg)
+	if cfg.system == m._ANDROID then
+		v.element("TargetName", nil, "lib$(RootNamespace)")
+	end
+end)
+
+p.override(v, "targetExt", function(base, cfg)
+	if cfg.system ~= m._ANDROID then
+		base(cfg)
+	else
+		if m.isApp(cfg.kind) or cfg.kind == "SharedLib" then
+			v.element("TargetExt", nil, ".so")
+		elseif cfg.kind == "StaticLib" then
+			v.element("TargetExt", nil, ".a")
+		end
+	end
+end)
+
 p.override(v, "debugInformationFormat", function(base, cfg)
 	if cfg.system ~= m._ANDROID then
 		base(cfg)
