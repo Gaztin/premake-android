@@ -61,12 +61,6 @@ p.override(v, "windowsSDKDesktopARMSupport", function(base, cfg)
 	end
 end)
 
-p.override(v, "targetName", function(base, cfg)
-	if cfg.system == m._ANDROID then
-		v.element("TargetName", nil, "lib$(RootNamespace)")
-	end
-end)
-
 p.override(v, "targetExt", function(base, cfg)
 	if cfg.system ~= m._ANDROID then
 		base(cfg)
