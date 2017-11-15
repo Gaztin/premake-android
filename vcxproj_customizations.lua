@@ -97,6 +97,15 @@ p.override(v, "generateDebugInformation", function(base, cfg)
 	end
 end)
 
+p.override(v, "warningLevel", function(base, cfg)
+	if cfg.system == m._ANDROID then
+		local map = { Off = "TurnOffAllWarnings", Extra = "EnableAllWarnings" }
+		v.element("WarningLevel", nil, map[cfg.warnings] or "TurnOffAllWarnings")
+	else
+		base(cfg)
+	end
+end)
+
 --
 -- Element functions
 --
