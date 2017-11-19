@@ -202,14 +202,13 @@ end
 
 function androidproj.files(prj)
 	premake.push("<ItemGroup>")
-	premake.w("<Content Include=\"res\\values\\strings.xml\" />")
-	premake.push("<AntBuildXml Include=\"build.xml\">")
+	premake.push("<AntBuildXml Include=\"" .. prj.name .. "/build.xml\">")
 	premake.w("<SubType>Designer</SubType>");
 	premake.pop("</AntBuildXml>")
-    premake.push("<AndroidManifest Include=\"AndroidManifest.xml\">")
+    premake.push("<AndroidManifest Include=\"" .. prj.name .. "/AndroidManifest.xml\">")
 	premake.w("<SubType>Designer</SubType>");
     premake.pop("</AndroidManifest>")
-    premake.w("<AntProjectPropertiesFile Include=\"project.properties\" />")
+    premake.w("<AntProjectPropertiesFile Include=\"" .. prj.name .. "/project.properties\" />")
 	premake.pop("</ItemGroup>")
 end
 
