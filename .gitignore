@@ -3,3 +3,6 @@
 *.sln
 *.xml
 project.properties
+.vs/
+bin/
+obj/
