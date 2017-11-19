@@ -59,12 +59,6 @@ premake.override(vc2010, "windowsSDKDesktopARMSupport", function(base, cfg)
 	end
 end)
 
-premake.override(vc2010, "targetName", function(base, cfg)
-	if cfg.system == android._ANDROID then
-		v.element("TargetName", nil, "lib$(RootNamespace)")
-	end
-end)
-
 premake.override(vc2010, "targetExt", function(base, cfg)
 	if cfg.system ~= android._ANDROID then
 		base(cfg)
@@ -97,6 +91,15 @@ end)
 
 premake.override(vc2010, "generateDebugInformation", function(base, cfg)
 	if cfg.system ~= android._ANDROID then
+		base(cfg)
+	end
+end)
+
+p.override(v, "warningLevel", function(base, cfg)
+	if cfg.system == m._ANDROID then
+		local map = { Off = "TurnOffAllWarnings", Extra = "EnableAllWarnings" }
+		v.element("WarningLevel", nil, map[cfg.warnings] or "TurnOffAllWarnings")
+	else
 		base(cfg)
 	end
 end)
