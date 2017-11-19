@@ -1,19 +1,17 @@
 require "vstudio"
 
-local p = premake
-local m = p.modules.android
-local v = p.vstudio.vc2010
-local e = v.elements
+local android = p.modules.android
+local vc2010 = p.vstudio.vc2010
 
 --
 -- Generate project
 --
 
-p.override(p.vstudio.vs2010, "generateProject", function(base, prj)
+premake.override(premake.vstudio.vs2010, "generateProject", function(base, prj)
 	base(prj)
 
-	if prj.system == m._ANDROID and m.isApp(prj.kind) then
-		p.generate(prj, m._PACKAGING .. ".androidproj", m.androidproj.generate)
+	if prj.system == android._ANDROID and android.isApp(prj.kind) then
+		premake.generate(prj, android._PACKAGING .. ".androidproj", android.androidproj.generate)
 	end
 end)
 
@@ -21,14 +19,14 @@ end)
 -- Globals
 --
 
-p.override(e, "globals", function(base, prj)
-	if prj.system == m._ANDROID then
+premake.override(vc2010.elements, "globals", function(base, prj)
+	if prj.system == android._ANDROID then
 		return table.join(base(prj), {
-			m.keyword,
-			m.rootNamespace,
-			m.defaultLanguage,
-			m.applicationType,
-			m.applicationTypeRevision,
+			android.keyword,
+			android.rootNamespace,
+			android.defaultLanguage,
+			android.applicationType,
+			android.applicationTypeRevision,
 		})
 	else
 		base(prj)
@@ -39,66 +37,66 @@ end)
 -- Configuration
 --
 
-p.override(v, "configurationType", function(base, cfg)
-	if cfg.system == m._ANDROID and m.isApp(cfg.kind) then
-		v.element("ConfigurationType", nil, "DynamicLibrary")
+premake.override(vc2010, "configurationType", function(base, cfg)
+	if cfg.system == android._ANDROID and android.isApp(cfg.kind) then
+		vc2010.element("ConfigurationType", nil, "DynamicLibrary")
 	else
 		base(cfg)
 	end
 end)
 
-p.override(v, "platformToolset", function(base, cfg)
-	if cfg.system == m._ANDROID then
-		v.element("PlatformToolset", nil, "Clang_3_8")
+premake.override(vc2010, "platformToolset", function(base, cfg)
+	if cfg.system == android._ANDROID then
+		vc2010.element("PlatformToolset", nil, "Clang_3_8")
 	else
 		base(cfg)
 	end
 end)
 
-p.override(v, "windowsSDKDesktopARMSupport", function(base, cfg)
-	if cfg.system ~= m._ANDROID then
+premake.override(vc2010, "windowsSDKDesktopARMSupport", function(base, cfg)
+	if cfg.system ~= android._ANDROID then
 		base(cfg)
 	end
 end)
 
-p.override(v, "targetName", function(base, cfg)
-	if cfg.system == m._ANDROID then
+premake.override(vc2010, "targetName", function(base, cfg)
+	if cfg.system == android._ANDROID then
 		v.element("TargetName", nil, "lib$(RootNamespace)")
 	end
 end)
 
-p.override(v, "targetExt", function(base, cfg)
-	if cfg.system ~= m._ANDROID then
+premake.override(vc2010, "targetExt", function(base, cfg)
+	if cfg.system ~= android._ANDROID then
 		base(cfg)
 	else
-		if m.isApp(cfg.kind) or cfg.kind == "SharedLib" then
-			v.element("TargetExt", nil, ".so")
+		if android.isApp(cfg.kind) or cfg.kind == "SharedLib" then
+			vc2010.element("TargetExt", nil, ".so")
 		elseif cfg.kind == "StaticLib" then
-			v.element("TargetExt", nil, ".a")
+			vc2010.element("TargetExt", nil, ".a")
 		end
 	end
 end)
 
-p.override(v, "debugInformationFormat", function(base, cfg)
-	if cfg.system ~= m._ANDROID then
+premake.override(vc2010, "debugInformationFormat", function(base, cfg)
+	if cfg.system ~= android._ANDROID then
 		base(cfg)
 	end
 end)
 
-p.override(v, "subSystem", function(base, cfg)
-	if cfg.system ~= m._ANDROID then
+premake.override(vc2010, "subSystem", function(base, cfg)
+	if cfg.system ~= android._ANDROID then
 		base(cfg)
 	end
 end)
 
-p.override(v, "importLibrary", function(base, cfg)
-	if cfg.system ~= m._ANDROID then
+premake.override(vc2010, "importLibrary", function(base, cfg)
+	if cfg.system ~= android._ANDROID then
 		base(cfg)
 	end
 end)
 
-p.override(v, "generateDebugInformation", function(base, cfg)
-	if cfg.system ~= m._ANDROID then
+premake.override(vc2010, "generateDebugInformation", function(base, cfg)
+	if cfg.system ~= android._ANDROID then
 		base(cfg)
 	end
 end)
@@ -107,32 +105,32 @@ end)
 -- Element functions
 --
 
-function m.keyword(prj)
-	if prj.system == m._ANDROID then
-		v.element("Keyword", nil, "Android")
+function android.keyword(prj)
+	if prj.system == android._ANDROID then
+		vc2010.element("Keyword", nil, "Android")
 	end
 end
 
-function m.rootNamespace(prj)
-	if prj.system == m._ANDROID then
-		v.element("RootNamespace", nil, prj.name)
+function android.rootNamespace(prj)
+	if prj.system == android._ANDROID then
+		vc2010.element("RootNamespace", nil, prj.name)
 	end
 end
 
-function m.defaultLanguage(prj)
-	if prj.system == m._ANDROID then
-		v.element("DefaultLanguage", nil, "en-US")
+function android.defaultLanguage(prj)
+	if prj.system == android._ANDROID then
+		vc2010.element("DefaultLanguage", nil, "en-US")
 	end
 end
 
-function m.applicationType(prj)
-	if prj.system == m._ANDROID then
-		v.element("ApplicationType", nil, "Android")
+function android.applicationType(prj)
+	if prj.system == android._ANDROID then
+		vc2010.element("ApplicationType", nil, "Android")
 	end
 end
 
-function m.applicationTypeRevision(prj)
-	if prj.system == m._ANDROID then
-		v.element("ApplicationTypeRevision", nil, "3.0")
+function android.applicationTypeRevision(prj)
+	if prj.system == android._ANDROID then
+		vc2010.element("ApplicationTypeRevision", nil, "3.0")
 	end
 end

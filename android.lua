@@ -1,15 +1,14 @@
-premake.modules.android = {}
+premake.extensions.android = {}
+local android = premake.extensions.android
 
-local m = premake.modules.android
-
-m._ANDROID = "android"
-m._PACKAGING = ".Packaging"
+android._ANDROID = "android"
+android._PACKAGING = ".Packaging"
 
 --
 -- Utility functions
 --
 
-function m.isApp(kind)
+function android.isApp(kind)
 	return kind == "ConsoleApp" or kind == "WindowedApp"
 end
 
@@ -27,4 +26,4 @@ include "vstudio_customizations.lua"
 include "sln_customizations.lua"
 include "vcxproj_customizations.lua"
 
-return m
+return android

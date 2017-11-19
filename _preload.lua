@@ -1,11 +1,9 @@
-local p = premake
-
 --
 -- Allow keywords
 --
 
-p.api.addAllowed("system", "android")
-p.api.addAllowed("architecture", "ARM64")
+premake.api.addAllowed("system", "android")
+premake.api.addAllowed("architecture", "ARM64")
 
 --
 -- When to load module

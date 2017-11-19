@@ -1,36 +1,34 @@
 require "vstudio"
 
-local p = premake
-local a = p.modules.android
-local v = p.vstudio.vc2010
-local e = v.elements
+local android = premake.extensions.android
+local vc2010 = p.vstudio.vc2010
+android.androidproj = {}
 
-a.androidproj = {}
-local m = a.androidproj
-m.elements = {}
+local androidproj = android.androidproj
+androidproj.elements = {}
 
 --
 -- Generate an Android project
 --
 
-m.elements.project = function(prj)
+androidproj.elements.project = function(prj)
 	return {
-		v.xmlDeclaration,
-		v.project,
-		v.projectConfigurations,
-		m.globals,
-		m.importDefaultProps,
-		m.configurationPropertiesGroup,
-		m.importLanguageSettings,
-		v.importExtensionSettings,
-		v.userMacros,
-		m.outputPropertiesGroup,
-		m.itemDefinitionGroups,
-		v.assemblyReferences,
-		m.files,
-		m.projectReferences,
-		m.importLanguageTargets,
-		v.importExtensionTargets,
+		vc2010.xmlDeclaration,
+		vc2010.project,
+		vc2010.projectConfigurations,
+		androidproj.globals,
+		androidproj.importDefaultProps,
+		androidproj.configurationPropertiesGroup,
+		androidproj.importLanguageSettings,
+		vc2010.importExtensionSettings,
+		vc2010.userMacros,
+		androidproj.outputPropertiesGroup,
+		androidproj.itemDefinitionGroups,
+		vc2010.assemblyReferences,
+		androidproj.files,
+		androidproj.projectReferences,
+		androidproj.importLanguageTargets,
+		vc2010.importExtensionTargets,
 	}
 end
 
@@ -38,289 +36,207 @@ end
 -- Generate android project
 --
 
-function m.generate(prj)
-	p.utf8()
-	p.callArray(m.elements.project, prj)
-	p.out('</Project>')
+function androidproj.generate(prj)
+	premake.utf8()
+	premake.callArray(androidproj.elements.project, prj)
+	premake.out('</Project>')
 
-	-- Create strings.xml
-	local strings = m.strings(prj)
-	os.mkdir("res/values")
-	local ok, err = os.writefile_ifnotequal(strings, "res/values/strings.xml")
-
-	-- Create AndroidManifest.xml
-	local androidManifest = m.androidManifest(prj)
-	local ok, err = os.writefile_ifnotequal(androidManifest, "AndroidManifest.xml")
-
-	-- Create build.xml
-	local build = m.build(prj)
-	local ok, err = os.writefile_ifnotequal(build, "build.xml")
-
-	-- Create project.properties
-	local projectProperties = m.projectProperties(prj)
-	local ok, err = os.writefile_ifnotequal(projectProperties, "project.properties")
+	premake.generate(prj, prj.name .. "/res/values/strings.xml", android.strings.generate)
+	premake.generate(prj, prj.name .. "/AndroidManifest.xml", android.manifest.generate)
+	premake.generate(prj, prj.name .. "/build.xml", android.manifest.generate)
+	premake.generate(prj, prj.name .. "/project.properties", android.manifest.generate)
 end
 
 --
 -- Globals
 --
 
-m.elements.globals = function(prj)
+androidproj.elements.globals = function(prj)
 	return {
-		m.rootNamespace,
-		m.minimalVisualStudioVersion,
-		m.projectVersion,
-		m.projectGuid,
+		androidproj.rootNamespace,
+		androidproj.minimalVisualStudioVersion,
+		androidproj.projectVersion,
+		androidproj.projectGuid,
 	}
 end
 
-function m.globals(prj)
-	v.propertyGroup(nil, "Globals")
-	p.callArray(m.elements.globals, prj)
-	p.pop('</PropertyGroup>')
+function androidproj.globals(prj)
+	vc2010.propertyGroup(nil, "Globals")
+	premake.callArray(androidproj.elements.globals, prj)
+	premake.pop('</PropertyGroup>')
 end
 
-function m.rootNamespace(prj)
-	v.element("RootNamespace", nil, prj.name)
+function androidproj.rootNamespace(prj)
+	vc2010.element("RootNamespace", nil, prj.name)
 end
 
-function m.minimalVisualStudioVersion(prj)
-	v.element("MinimumVisualStudioVersion", nil, "14.0")
+function androidproj.minimalVisualStudioVersion(prj)
+	vc2010.element("MinimumVisualStudioVersion", nil, "14.0")
 end
 
-function m.projectVersion(prj)
-	v.element("ProjectVersion", nil, "1.0")
+function androidproj.projectVersion(prj)
+	vc2010.element("ProjectVersion", nil, "1.0")
 end
 
-function m.projectGuid(prj)
+function androidproj.projectGuid(prj)
 	local prjname = prj.name .. a._PACKAGING
 	local guid = os.uuid(prjname)
 
-	v.element("ProjectGuid", nil, "{%s}", guid)
+	vc2010.element("ProjectGuid", nil, "{%s}", guid)
 end
 
 --
 -- Default props
 --
 
-function m.importDefaultProps(prj)
-	p.w("<Import Project=\"$(AndroidTargetsPath)\\Android.Default.props\" />")
+function androidproj.importDefaultProps(prj)
+	premake.w('<Import Project="$(AndroidTargetsPath)\\Android.Default.props" />')
 end
 
 --
 -- Configuration properties group
 --
 
-m.elements.configurationProperties = function(cfg)
+androidproj.elements.configurationProperties = function(cfg)
 	return {
-		m.configurationType,
+		androidproj.configurationType,
 	}
 end
 
-function m.configurationProperties(cfg)
-	v.propertyGroup(cfg, "Configuration")
-	p.callArray(m.elements.configurationProperties, cfg)
-	p.pop('</PropertyGroup>')
+function androidproj.configurationProperties(cfg)
+	vc2010.propertyGroup(cfg, "Configuration")
+	premake.callArray(androidproj.elements.configurationProperties, cfg)
+	premake.pop('</PropertyGroup>')
 end
 
-function m.configurationPropertiesGroup(prj)
-	for cfg in p.project.eachconfig(prj) do
-		m.configurationProperties(cfg)
+function androidproj.configurationPropertiesGroup(prj)
+	for cfg in premake.project.eachconfig(prj) do
+		androidproj.configurationProperties(cfg)
 	end
 end
 
-function m.configurationType(cfg)
-	p.w("<ConfigurationType>Application</ConfigurationType>")
+function androidproj.configurationType(cfg)
+	premake.w("<ConfigurationType>Application</ConfigurationType>")
 end
 
 --
 -- Import language settings
 --
 
-function m.importLanguageSettings(prj)
-	p.w("<Import Project=\"$(AndroidTargetsPath)\\Android.props\" />")
+function androidproj.importLanguageSettings(prj)
+	premake.w('<Import Project="$(AndroidTargetsPath)\\Android.props" />')
 end
 
 --
 -- Output properties group
 --
 
-m.elements.outputProperties = function(cfg)
+androidproj.elements.outputProperties = function(cfg)
 	return {
-		m.outDir,
-		v.intDir,
-		m.targetName,
-		m.targetExt,
+		androidproj.outDir,
+		vc2010.intDir,
+		androidproj.targetName,
+		androidproj.targetExt,
 	}
 end
 
-function m.outputProperties(cfg)
-	v.propertyGroup(cfg)
-	p.callArray(m.elements.outputProperties, cfg)
-	p.pop('</PropertyGroup>')
+function androidproj.outputProperties(cfg)
+	vc2010.propertyGroup(cfg)
+	premake.callArray(androidproj.elements.outputProperties, cfg)
+	premake.pop('</PropertyGroup>')
 end
 
-function m.outputPropertiesGroup(prj)
-	for cfg in p.project.eachconfig(prj) do
-		m.outputProperties(cfg)
+function androidproj.outputPropertiesGroup(prj)
+	for cfg in premake.project.eachconfig(prj) do
+		androidproj.outputProperties(cfg)
 	end
 end
 
-function m.outDir(cfg)
-	local outdir = p.vstudio.path(cfg, cfg.buildtarget.directory)
+function androidproj.outDir(cfg)
+	local outdir = premake.vstudio.path(cfg, cfg.buildtarget.directory)
 	if outdir:sub(1, 1) == "$" then
-		v.element("OutDir", nil, "%s\\", outdir)
+		vc2010.element("OutDir", nil, '%s', outdir)
 	else
-		v.element("OutDir", nil, "$(ProjectDir)%s\\", outdir)
+		vc2010.element("OutDir", nil, "$(ProjectDir)%s\\", outdir)
 	end
 end
 
-function m.targetName(cfg)
-	v.element("TargetName", nil, "$(RootNamespace)")
+function androidproj.targetName(cfg)
+	vc2010.element("TargetName", nil, "$(RootNamespace)")
 end
 
-function m.targetExt(cfg)
-	v.element("TargetExt", nil, ".apk")
+function androidproj.targetExt(cfg)
+	vc2010.element("TargetExt", nil, ".apk")
 end
 
 --
 -- Item definition groups
 --
 
-m.elements.itemDefinitionGroup = function(cfg)
+androidproj.elements.itemDefinitionGroup = function(cfg)
 	return {
-		m.antPackage,
+		androidproj.antPackage,
 	}
 end
 
-function m.itemDefinitionGroup(cfg)
-	p.push("<ItemDefinitionGroup %s>", v.condition(cfg))
-	p.callArray(m.elements.itemDefinitionGroup, cfg)
-	p.pop("</ItemDefinitionGroup>")
+function androidproj.itemDefinitionGroup(cfg)
+	premake.push("<ItemDefinitionGroup %s>", vc2010.condition(cfg))
+	premake.callArray(m.elements.itemDefinitionGroup, cfg)
+	premake.pop("</ItemDefinitionGroup>")
 end
 
-function m.itemDefinitionGroups(prj)
-	for cfg in p.project.eachconfig(prj) do
-		m.itemDefinitionGroup(cfg)
+function androidproj.itemDefinitionGroups(prj)
+	for cfg in premake.project.eachconfig(prj) do
+		androidproj.itemDefinitionGroup(cfg)
 	end
 end
 
-function m.antPackage(cfg)
-	p.push("<AntPackage>")
-	p.w("<AndroidAppLibName>$(RootNamespace)</AndroidAppLibName>")
-	p.pop("</AntPackage>")
+function androidproj.antPackage(cfg)
+	premake.push("<AntPackage>")
+	premake.w("<AndroidAppLibName>$(RootNamespace)</AndroidAppLibName>")
+	premake.pop("</AntPackage>")
 end
 
 --
 -- Files
 --
 
-function m.files(prj)
-	p.push("<ItemGroup>")
-	p.w("<Content Include=\"res\\values\\strings.xml\" />")
-	p.push("<AntBuildXml Include=\"build.xml\">")
-	p.w("<SubType>Designer</SubType>");
-	p.pop("</AntBuildXml>")
-    p.push("<AndroidManifest Include=\"AndroidManifest.xml\">")
-	p.w("<SubType>Designer</SubType>");
-    p.pop("</AndroidManifest>")
-    p.w("<AntProjectPropertiesFile Include=\"project.properties\" />")
-	p.pop("</ItemGroup>")
+function androidproj.files(prj)
+	premake.push("<ItemGroup>")
+	premake.w("<Content Include=\"res\\values\\strings.xml\" />")
+	premake.push("<AntBuildXml Include=\"build.xml\">")
+	premake.w("<SubType>Designer</SubType>");
+	premake.pop("</AntBuildXml>")
+    premake.push("<AndroidManifest Include=\"AndroidManifest.xml\">")
+	premake.w("<SubType>Designer</SubType>");
+    premake.pop("</AndroidManifest>")
+    premake.w("<AntProjectPropertiesFile Include=\"project.properties\" />")
+	premake.pop("</ItemGroup>")
 end
 
 --
 -- Project references
 --
 
-function m.projectReferences(prj)
-	local refs = p.project.getdependencies(prj, 'linkOnly')
-	p.push('<ItemGroup>')
+function androidproj.projectReferences(prj)
+	local refs = premake.project.getdependencies(prj, 'linkOnly')
+	premake.push('<ItemGroup>')
 	for _, ref in ipairs(refs) do
-		local relpath = p.vstudio.path(prj, p.vstudio.projectfile(ref))
-		p.push('<ProjectReference Include=\"%s\">', relpath)
-		p.callArray(v.elements.projectReferences, prj, ref)
-		p.pop('</ProjectReference>')
+		local relpath = premake.vstudio.path(prj, premake.vstudio.projectfile(ref))
+		premake.push('<ProjectReference Include=\"%s\">', relpath)
+		premake.callArray(vc2010.elements.projectReferences, prj, ref)
+		premake.pop('</ProjectReference>')
 	end
-	p.push("<ProjectReference Include=\"" .. prj.name .. ".vcxproj\">")
-	p.w("<Project>{" .. prj.uuid .. "}</Project>")
-	p.pop("</ProjectReference>")
-	p.pop('</ItemGroup>')
+	premake.push("<ProjectReference Include=\"" .. prj.name .. ".vcxproj\">")
+	premake.w("<Project>{" .. prj.uuid .. "}</Project>")
+	premake.pop("</ProjectReference>")
+	premake.pop('</ItemGroup>')
 end
 
 --
 -- Import language targets
 --
 
-function m.importLanguageTargets(prj)
-	p.w("<Import Project=\"$(AndroidTargetsPath)\\Android.targets\" />")
-end
-
---
--- Generated files
---
-
-m.stringsRaw = [[
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-  <string name="app_name">%s%s</string>
-</resources>
-]]
-
-function m.strings(prj)
-	return string.format(m.stringsRaw, prj.name, a._PACKAGING)
-end
-
-m.androidManifestRaw = [[
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.$(ApplicationName)" android:versionCode="1" android:versionName="1.0">
-  <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="21"/>
-  <application android:label="@string/app_name" android:hasCode="false">
-    <activity android:name="android.app.NativeActivity" android:label="@string/app_name" android:configChanges="orientation|keyboardHidden">
-      <meta-data android:name="android.app.lib_name" android:value="$(AndroidAppLibName)" />
-      <intent-filter>
-        <action android:name="android.intent.action.MAIN" />
-        <category android:name="android.intent.category.LAUNCHER" />
-      </intent-filter>
-    </activity>
-  </application>
-</manifest>
-]]
-
-function m.androidManifest(prj)
-	return string.format(m.androidManifestRaw)
-end
-
-m.buildRaw = [[
-<?xml version="1.0" encoding="UTF-8"?>
-<project name="$(projectname)" default="help">
-  <property file="ant.properties" />
-  <property environment="env" />
-  <condition property="sdk.dir" value="${env.ANDROID_HOME}">
-    <isset property="env.ANDROID_HOME" />
-  </condition>
-  <loadproperties srcFile="project.properties" />
-  <fail message="sdk.dir is missing. Make sure ANDROID_HOME environment variable is correctly set." unless="sdk.dir" />
-  <import file="custom_rules.xml" optional="true" />
-  <import file="${sdk.dir}/tools/ant/build.xml" />
-  <target name="-pre-compile">
-    <path id="project.all.jars.path">
-      <path path="${toString:project.all.jars.path}"/>
-      <fileset dir="${jar.libs.dir}">
-        <include name="*.jar"/>
-      </fileset>
-    </path>
-  </target>
-</project>
-]]
-
-function m.build(prj)
-	return string.format(m.buildRaw)
-end
-
-m.projectPropertiesRaw = [[
-target=$(androidapilevel)
-]]
-
-function m.projectProperties(prj)
-	return string.format(m.projectPropertiesRaw)
+function androidproj.importLanguageTargets(prj)
+	premake.w("<Import Project=\"$(AndroidTargetsPath)\\Android.targets\" />")
 end
