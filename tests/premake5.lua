@@ -57,3 +57,9 @@ project "Application4"
 		"-lGLESv1_CM",
 		"-lEGL",
 	}
+	filter {"configurations:Debug"}
+		symbols "On"
+		optimize "Off"
+	filter {"configurations:Release"}
+		symbols "Off"
+		optimize "Full"
