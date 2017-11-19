@@ -1,7 +1,7 @@
 require "vstudio"
 
-local android = p.modules.android
-local vc2010 = p.vstudio.vc2010
+local android = premake.modules.android
+local vc2010 = premake.vstudio.vc2010
 
 --
 -- Generate project
@@ -95,10 +95,10 @@ premake.override(vc2010, "generateDebugInformation", function(base, cfg)
 	end
 end)
 
-p.override(v, "warningLevel", function(base, cfg)
-	if cfg.system == m._ANDROID then
+premake.override(vc2010, "warningLevel", function(base, cfg)
+	if cfg.system == android._ANDROID then
 		local map = { Off = "TurnOffAllWarnings", Extra = "EnableAllWarnings" }
-		v.element("WarningLevel", nil, map[cfg.warnings] or "TurnOffAllWarnings")
+		vc2010.element("WarningLevel", nil, map[cfg.warnings] or "TurnOffAllWarnings")
 	else
 		base(cfg)
 	end

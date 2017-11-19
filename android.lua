@@ -21,9 +21,8 @@ include "_preload.lua"
 -- Packaging
 include "androidproj.lua"
 include "androidproj_build_xml.lua"
-include "androidproj_maniefest_xml.lua"
+include "androidproj_manifest_xml.lua"
 include "androidproj_project_properties.lua"
-include "androidproj_strings_xml.lua"
 
 -- Customizations
 include "vstudio_customizations.lua"

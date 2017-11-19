@@ -1,7 +1,7 @@
 require "vstudio"
 
-local android = p.modules.android
-local vstudio = p.vstudio
+local android = premake.modules.android
+local vstudio = premake.vstudio
 
 --
 -- Project platform

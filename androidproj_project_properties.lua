@@ -8,5 +8,5 @@ local properties = android.properties
 --
 
 function properties.generate(prj)
-	premake.w(0, 'target=$(androidapilevel)')
+	_p(0, 'target=$(androidapilevel)')
 end

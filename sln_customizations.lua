@@ -11,7 +11,7 @@ premake.override(sln2005, "projects", function(base, wks)
 	base(wks)
 
 	for prj in premake.workspace.eachproject(wks) do
-		if prj.system == m._ANDROID and android.isApp(prj.kind) then
+		if prj.system == android._ANDROID and android.isApp(prj.kind) then
 			local prjname = prj.name .. android._PACKAGING
 			local prjpath = prj.location .. "/" .. prjname .. ".androidproj"
 			local prjuuid = os.uuid(prjname)

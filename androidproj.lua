@@ -1,7 +1,7 @@
 require "vstudio"
 
 local android = premake.extensions.android
-local vc2010 = p.vstudio.vc2010
+local vc2010 = premake.vstudio.vc2010
 android.androidproj = {}
 
 local androidproj = android.androidproj
@@ -41,10 +41,9 @@ function androidproj.generate(prj)
 	premake.callArray(androidproj.elements.project, prj)
 	premake.out('</Project>')
 
-	premake.generate(prj, prj.name .. "/res/values/strings.xml", android.strings.generate)
 	premake.generate(prj, prj.name .. "/AndroidManifest.xml", android.manifest.generate)
-	premake.generate(prj, prj.name .. "/build.xml", android.manifest.generate)
-	premake.generate(prj, prj.name .. "/project.properties", android.manifest.generate)
+	premake.generate(prj, prj.name .. "/build.xml", android.build.generate)
+	premake.generate(prj, prj.name .. "/project.properties", android.properties.generate)
 end
 
 --
@@ -79,7 +78,7 @@ function androidproj.projectVersion(prj)
 end
 
 function androidproj.projectGuid(prj)
-	local prjname = prj.name .. a._PACKAGING
+	local prjname = prj.name .. android._PACKAGING
 	local guid = os.uuid(prjname)
 
 	vc2010.element("ProjectGuid", nil, "{%s}", guid)
@@ -181,7 +180,7 @@ end
 
 function androidproj.itemDefinitionGroup(cfg)
 	premake.push("<ItemDefinitionGroup %s>", vc2010.condition(cfg))
-	premake.callArray(m.elements.itemDefinitionGroup, cfg)
+	premake.callArray(androidproj.elements.itemDefinitionGroup, cfg)
 	premake.pop("</ItemDefinitionGroup>")
 end
 
