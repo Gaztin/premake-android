@@ -1,0 +1,5 @@
+*.androidproj
+*.vcxproj
+*.sln
+*.xml
+project.properties
