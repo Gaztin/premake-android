@@ -98,6 +98,7 @@ end
 
 androidproj.elements.configurationProperties = function(cfg)
 	return {
+		androidproj.useDebugLibraries,
 		androidproj.configurationType,
 	}
 end
@@ -112,6 +113,11 @@ function androidproj.configurationPropertiesGroup(prj)
 	for cfg in premake.project.eachconfig(prj) do
 		androidproj.configurationProperties(cfg)
 	end
+end
+
+function androidproj.useDebugLibraries(cfg)
+	local runtime = premake.config.getruntime(cfg)
+	premake.w("<UseDebugLibraries>%s</UseDebugLibraries>", tostring(runtime:endswith("Debug")))
 end
 
 function androidproj.configurationType(cfg)
