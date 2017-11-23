@@ -104,6 +104,18 @@ premake.override(vc2010, "warningLevel", function(base, cfg)
 	end
 end)
 
+premake.override(vc2010, "exceptionHandling", function(base, cfg)
+	if cfg.system == android._ANDROID then
+		if cfg.exceptionhandling == premake.OFF then
+			vc2010.element("ExceptionHandling", nil, "Disabled")
+		elseif cfg.exceptionhandling == "On" then
+			vc2010.element("ExceptionHandling", nil, "Enabled")
+		end
+	else
+		base(cfg)
+	end
+end)
+
 --
 -- Element functions
 --
