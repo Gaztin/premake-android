@@ -209,8 +209,27 @@ function androidproj.itemDefinitionGroups(prj)
 end
 
 function androidproj.antPackage(cfg)
+	local app_lib_name = nil;
+	local deps = premake.project.getdependencies(cfg.project, "dependOnly")
+
+	-- Go through all the dependent projects and find an application project
+	for i, prj in ipairs(deps) do
+		if android.isApp(prj.kind) then
+			if app_lib_name == nil then
+				app_lib_name = prj.name
+			else
+				premake.error("Package project '%s' has too many application project dependencies", cfg.project.name)
+			end
+		end
+	end
+
+	-- Make sure the package project depends on an application project
+	if app_lib_name == nil then
+		premake.error("Package project '%s' doesn't depend on any application projects", cfg.project.name)
+	end
+
 	premake.push("<AntPackage>")
-	premake.w("<AndroidAppLibName>$(RootNamespace)</AndroidAppLibName>")
+	premake.w("<AndroidAppLibName>%s</AndroidAppLibName>", app_lib_name)
 	premake.pop("</AntPackage>")
 end
 
