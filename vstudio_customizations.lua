@@ -9,43 +9,43 @@ local vs2010 = vstudio.vs2010
 --
 
 premake.override(vs2010, "generateProject", function(base, prj)
-	if prj.system == android._ANDROID  then
-		if android.isPackaging(prj.kind) then
-			premake.eol("\r\n")
-			premake.indent("  ")
-			premake.escaper(vs2010.esc)
-
-			local prjModified = premake.generate(prj, android._ANDROIDPROJ, android.androidproj.generate)
-
-			-- Skip generation of empty user files
-			local user = premake.capture(function()
-				vstudio.vc2010.generateUser(prj)
-			end)
-			if #user > 0 then
-				premake.generate(prj, android._ANDROIDPROJ .. ".user", function()
-					premake.outln(user)
-				end)
-			end
-
-			-- Only generate a filters file if the source tree actually has subfolders
-			if premake.tree.hasbranches(premake.project.getsourcetree(prj)) then
-				if premake.generate(prj, android._ANDROIDPROJ .. ".filters", vstudio.vc2010.generateFilters) == true and prjModified == false then
-					-- vs workaround for issue where if only the .filters file is modified, VS doesn't automatically trigger a reload
-					premake.touch(prj, android._ANDROIDPROJ)
-				end
-			end
-		elseif android.isApp(prj.kind) then
-			-- Go through all the packaging projects in the workspace to find one that depends on this application project
-			for p in premake.workspace.eachproject(prj.workspace) do
-				if p.system == android._ANDROID and android.isPackaging(p.kind) then
-					local dependent_prj = android.androidproj.getDependentProject(p)
-					if dependent_prj == prj then
-						-- If it found one, insert the asset copying post-build event
-						for cfg in premake.project.eachconfig(prj) do
-							table.insert(cfg["postbuildcommands"], "xcopy /sy \"$(LocalDebuggerWorkingDirectory)\\data\" \"" .. p.location .. "/Assets\"")
-						end
+	if prj.system == android._ANDROID and android.isApp(prj.kind) then
+		-- Go through all the packaging projects in the workspace to find one that depends on this application project
+		for p in premake.workspace.eachproject(prj.workspace) do
+			if p.system == android._ANDROID and android.isPackaging(p.kind) then
+				local dependent_prj = android.androidproj.getDependentProject(p)
+				if dependent_prj == prj then
+					-- If it found one, insert the asset copying post-build event
+					for cfg in premake.project.eachconfig(prj) do
+						table.insert(cfg["postbuildcommands"], "xcopy /sy \"$(LocalDebuggerWorkingDirectory)\\data\" \"" .. p.location .. "/Assets\"")
 					end
 				end
+			end
+		end
+	end
+
+	if prj.system == android._ANDROID and android.isPackaging(prj.kind) then
+		premake.eol("\r\n")
+		premake.indent("  ")
+		premake.escaper(vs2010.esc)
+
+		local prjModified = premake.generate(prj, android._ANDROIDPROJ, android.androidproj.generate)
+
+		-- Skip generation of empty user files
+		local user = premake.capture(function()
+			vstudio.vc2010.generateUser(prj)
+		end)
+		if #user > 0 then
+			premake.generate(prj, android._ANDROIDPROJ .. ".user", function()
+				premake.outln(user)
+			end)
+		end
+
+		-- Only generate a filters file if the source tree actually has subfolders
+		if premake.tree.hasbranches(premake.project.getsourcetree(prj)) then
+			if premake.generate(prj, android._ANDROIDPROJ .. ".filters", vstudio.vc2010.generateFilters) == true and prjModified == false then
+				-- vs workaround for issue where if only the .filters file is modified, VS doesn't automatically trigger a reload
+				premake.touch(prj, android._ANDROIDPROJ)
 			end
 		end
 	else
