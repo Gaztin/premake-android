@@ -9,6 +9,30 @@ local androidproj = android.androidproj
 androidproj.elements = {}
 
 --
+-- Utility functions
+--
+
+function androidproj.getDependentProject(prj)
+	local dependent_prj = nil;
+	local deps = premake.project.getdependencies(prj, "dependOnly")
+
+	-- Go through all the dependent projects and find an application project
+	for i, dp in ipairs(deps) do
+		if android.isApp(dp.kind) then
+			dependent_prj = dp
+			break
+		end
+	end
+
+	-- Make sure the package project depends on an application project
+	if dependent_prj == nil then
+		premake.error("Package project '%s' doesn't depend on any application projects", cfg.project.name)
+	end
+
+	return dependent_prj
+end
+
+--
 -- Generate an Android project
 --
 
@@ -45,6 +69,9 @@ function androidproj.generate(prj)
 	premake.generate(prj, prj.name .. "/AndroidManifest.xml", android.manifest.generate)
 	premake.generate(prj, prj.name .. "/build.xml", android.build.generate)
 	premake.generate(prj, prj.name .. "/project.properties", android.properties.generate)
+
+	-- Create the assets folder
+	os.mkdir(prj.location .. "\\Assets")
 end
 
 --
@@ -209,27 +236,10 @@ function androidproj.itemDefinitionGroups(prj)
 end
 
 function androidproj.antPackage(cfg)
-	local app_lib_name = nil;
-	local deps = premake.project.getdependencies(cfg.project, "dependOnly")
-
-	-- Go through all the dependent projects and find an application project
-	for i, prj in ipairs(deps) do
-		if android.isApp(prj.kind) then
-			if app_lib_name == nil then
-				app_lib_name = prj.name
-			else
-				premake.error("Package project '%s' has too many application project dependencies", cfg.project.name)
-			end
-		end
-	end
-
-	-- Make sure the package project depends on an application project
-	if app_lib_name == nil then
-		premake.error("Package project '%s' doesn't depend on any application projects", cfg.project.name)
-	end
+	local dependent_prj = androidproj.getDependentProject(cfg.project)
 
 	premake.push("<AntPackage>")
-	premake.w("<AndroidAppLibName>%s</AndroidAppLibName>", app_lib_name)
+	premake.w("<AndroidAppLibName>%s</AndroidAppLibName>", dependent_prj.name)
 	premake.pop("</AntPackage>")
 end
 
@@ -246,6 +256,16 @@ function androidproj.files(prj)
 	premake.w("<SubType>Designer</SubType>");
     premake.pop("</AndroidManifest>")
     premake.w("<AntProjectPropertiesFile Include=\"" .. prj.name .. "/project.properties\" />")
+	premake.pop("</ItemGroup>")
+
+	-- Add asset files
+	premake.push("<ItemGroup>")
+	local tr = premake.project.getsourcetree(prj)
+	premake.tree.traverse(tr, {
+		onleaf = function(file)
+			premake.w("<Content Include=\"Assets/%s\" />", file.path)
+		end
+		})
 	premake.pop("</ItemGroup>")
 end
 
