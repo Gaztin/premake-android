@@ -23,8 +23,12 @@ project "Application"
 	linkoptions {
 		"-lEGL",
 	}
-```
 
-## Notes
-* Specify `system "android"` in your project to activate the module.
-* Make sure you run the "Application.Packaging" project to deploy and debug your application.
+project "Application.Packaging"
+	dependson "Application"
+	kind "Packaging"
+	system "android"
+	files {
+		"assets/**",
+	}
+```
