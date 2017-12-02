@@ -4,18 +4,6 @@ local android = premake.modules.android
 local vc2010 = premake.vstudio.vc2010
 
 --
--- Generate project
---
-
-premake.override(premake.vstudio.vs2010, "generateProject", function(base, prj)
-	base(prj)
-
-	if prj.system == android._ANDROID and android.isApp(prj.kind) then
-		premake.generate(prj, android._PACKAGING .. ".androidproj", android.androidproj.generate)
-	end
-end)
-
---
 -- Globals
 --
 

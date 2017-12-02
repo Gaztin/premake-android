@@ -2,6 +2,7 @@ require "vstudio"
 
 local android = premake.extensions.android
 local vc2010 = premake.vstudio.vc2010
+local sln2005 = premake.vstudio.sln2005
 android.androidproj = {}
 
 local androidproj = android.androidproj
@@ -26,7 +27,7 @@ androidproj.elements.project = function(prj)
 		androidproj.itemDefinitionGroups,
 		vc2010.assemblyReferences,
 		androidproj.files,
-		androidproj.projectReferences,
+		vc2010.projectReferences,
 		androidproj.importLanguageTargets,
 		vc2010.importExtensionTargets,
 	}
@@ -47,6 +48,24 @@ function androidproj.generate(prj)
 end
 
 --
+-- Solution extensions
+--
+
+premake.override(sln2005.elements, "projectConfigurationPlatforms", function(base, cfg, context)
+	if context.prj.system == android._ANDROID and android.isPackaging(context.prj.kind) then
+		return table.join(base(cfg, context), {
+			androidproj.deploy0,
+		})
+	else
+		return base(cfg, context)
+	end
+end)
+
+function androidproj.deploy0(cfg, context)
+	premake.w("{%s}.%s.Deploy.0 = %s|%s", context.prj.uuid, context.descriptor, context.platform, context.architecture)
+end
+
+--
 -- Globals
 --
 
@@ -55,7 +74,7 @@ androidproj.elements.globals = function(prj)
 		androidproj.rootNamespace,
 		androidproj.minimalVisualStudioVersion,
 		androidproj.projectVersion,
-		androidproj.projectGuid,
+		vc2010.projectGuid,
 	}
 end
 
@@ -75,13 +94,6 @@ end
 
 function androidproj.projectVersion(prj)
 	vc2010.element("ProjectVersion", nil, "1.0")
-end
-
-function androidproj.projectGuid(prj)
-	local prjname = prj.name .. android._PACKAGING
-	local guid = os.uuid(prjname)
-
-	vc2010.element("ProjectGuid", nil, "{%s}", guid)
 end
 
 --
@@ -216,25 +228,6 @@ function androidproj.files(prj)
     premake.pop("</AndroidManifest>")
     premake.w("<AntProjectPropertiesFile Include=\"" .. prj.name .. "/project.properties\" />")
 	premake.pop("</ItemGroup>")
-end
-
---
--- Project references
---
-
-function androidproj.projectReferences(prj)
-	local refs = premake.project.getdependencies(prj, 'linkOnly')
-	premake.push('<ItemGroup>')
-	for _, ref in ipairs(refs) do
-		local relpath = premake.vstudio.path(prj, premake.vstudio.projectfile(ref))
-		premake.push('<ProjectReference Include=\"%s\">', relpath)
-		premake.callArray(vc2010.elements.projectReferences, prj, ref)
-		premake.pop('</ProjectReference>')
-	end
-	premake.push("<ProjectReference Include=\"" .. prj.name .. ".vcxproj\">")
-	premake.w("<Project>{" .. prj.uuid .. "}</Project>")
-	premake.pop("</ProjectReference>")
-	premake.pop('</ItemGroup>')
 end
 
 --

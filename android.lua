@@ -2,6 +2,7 @@ premake.extensions.android = {}
 local android = premake.extensions.android
 
 android._ANDROID = "android"
+android._ANDROIDPROJ = ".androidproj"
 android._PACKAGING = ".Packaging"
 
 --
@@ -10,6 +11,10 @@ android._PACKAGING = ".Packaging"
 
 function android.isApp(kind)
 	return kind == "ConsoleApp" or kind == "WindowedApp"
+end
+
+function android.isPackaging(kind)
+	return kind == "Packaging"
 end
 
 --
@@ -26,7 +31,6 @@ include "androidproj_project_properties.lua"
 
 -- Customizations
 include "vstudio_customizations.lua"
-include "sln_customizations.lua"
 include "vcxproj_customizations.lua"
 
 return android
