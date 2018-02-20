@@ -26,7 +26,7 @@ function androidproj.getDependentProject(prj)
 
 	-- Make sure the package project depends on an application project
 	if dependent_prj == nil then
-		premake.error("Package project '%s' doesn't depend on any application projects", cfg.project.name)
+		premake.error("Package project '%s' doesn't depend on any application projects", prj.name)
 	end
 
 	return dependent_prj
