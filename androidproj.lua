@@ -177,7 +177,7 @@ end
 
 androidproj.elements.outputProperties = function(cfg)
 	return {
-		androidproj.outDir,
+		vc2010.outDir,
 		vc2010.intDir,
 		androidproj.targetName,
 		androidproj.targetExt,
@@ -193,15 +193,6 @@ end
 function androidproj.outputPropertiesGroup(prj)
 	for cfg in premake.project.eachconfig(prj) do
 		androidproj.outputProperties(cfg)
-	end
-end
-
-function androidproj.outDir(cfg)
-	local outdir = premake.vstudio.path(cfg, cfg.buildtarget.directory)
-	if outdir:sub(1, 1) == "$" then
-		vc2010.element("OutDir", nil, '%s', outdir)
-	else
-		vc2010.element("OutDir", nil, "$(ProjectDir)%s\\", outdir)
 	end
 end
 
