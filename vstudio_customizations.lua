@@ -17,7 +17,7 @@ premake.override(vs2010, "generateProject", function(base, prj)
 				if dependent_prj == prj then
 					-- If it found one, insert the asset copying post-build event
 					for cfg in premake.project.eachconfig(prj) do
-						table.insert(cfg["postbuildcommands"], "xcopy /sy \"$(LocalDebuggerWorkingDirectory)\\data\" \"" .. p.location .. "/Assets\"")
+						table.insert(cfg["postbuildcommands"], "if exist \"$(LocalDebuggerWorkingDirectory)\\data\\\" xcopy /sy \"$(LocalDebuggerWorkingDirectory)\\data\" \"" .. p.location .. "/Assets\"")
 					end
 				end
 			end
