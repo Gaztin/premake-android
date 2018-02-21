@@ -25,6 +25,19 @@ end)
 -- Configuration
 --
 
+premake.override(vc2010, "additionalDependencies", function(base, cfg, explicit)
+	if cfg.system == android._ANDROID then
+		local links = premake.config.getlinks(cfg, "system", "fullpath")
+		
+		if #links > 0 then
+			links = path.translate(table.concat(links, ";"))
+			vc2010.element("LibraryDependencies", nil, "%s;%%(LibraryDependencies)", links);
+		end
+	else
+		base(cfg, explicit)
+	end
+end)
+
 premake.override(vc2010, "configurationType", function(base, cfg)
 	if cfg.system == android._ANDROID and android.isApp(cfg.kind) then
 		vc2010.element("ConfigurationType", nil, "DynamicLibrary")
