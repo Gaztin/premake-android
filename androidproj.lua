@@ -156,11 +156,12 @@ end
 
 function androidproj.useDebugLibraries(cfg)
 	local runtime = premake.config.getruntime(cfg)
-	premake.w("<UseDebugLibraries>%s</UseDebugLibraries>", tostring(runtime:endswith("Debug")))
+	local is_debug = runtime:endswith("Debug")
+	vc2010.element("UseDebugLibraries", nil, tostring(is_debug))
 end
 
 function androidproj.configurationType(cfg)
-	premake.w("<ConfigurationType>Application</ConfigurationType>")
+	vc2010.element("ConfigurationType", nil, "Application")
 end
 
 --
