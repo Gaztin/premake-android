@@ -25,6 +25,16 @@ end)
 -- Configuration
 --
 
+premake.override(vc2010.elements, "configurationProperties", function(base, cfg)
+	if cfg.system == android._ANDROID then
+		return table.join(base(cfg), {
+			android.androidApiLevel,
+		})
+	else
+		return base(cfg)
+	end
+end)
+
 premake.override(vc2010, "additionalDependencies", function(base, cfg, explicit)
 	if cfg.system == android._ANDROID then
 		local links = premake.config.getlinks(cfg, "system", "fullpath")
@@ -170,5 +180,12 @@ end
 function android.applicationTypeRevision(prj)
 	if prj.system == android._ANDROID then
 		vc2010.element("ApplicationTypeRevision", nil, "3.0")
+	end
+end
+
+function android.androidApiLevel(cfg)
+	if cfg.system == android._ANDROID then
+		local apiLevel = cfg.androidapilevel or android._DEFAULT_API_LEVEL
+		vc2010.element("AndroidAPILevel", nil, apiLevel)
 	end
 end

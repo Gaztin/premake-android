@@ -4,6 +4,7 @@ local android = premake.extensions.android
 android._ANDROID = "android"
 android._ANDROIDPROJ = ".androidproj"
 android._PACKAGING = ".Packaging"
+android._DEFAULT_API_LEVEL = "android-19"
 
 --
 -- Utility functions

@@ -139,6 +139,7 @@ androidproj.elements.configurationProperties = function(cfg)
 	return {
 		androidproj.useDebugLibraries,
 		androidproj.configurationType,
+		android.androidApiLevel,
 	}
 end
 

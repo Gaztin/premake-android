@@ -12,6 +12,16 @@ local current_action = premake.action.current()
 table.insert(current_action.valid_kinds, "Packaging")
 
 --
+-- Register properties
+--
+
+premake.api.register {
+	name = "androidapilevel",
+	scope = "config",
+	kind = "string",
+}
+
+--
 -- When to load module
 --
 
