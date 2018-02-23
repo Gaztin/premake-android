@@ -1,6 +1,6 @@
 require "vstudio"
 
-local android = premake.modules.android
+local android = premake.extensions.android
 local vc2010 = premake.vstudio.vc2010
 
 --
