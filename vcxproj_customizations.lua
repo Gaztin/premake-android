@@ -17,7 +17,7 @@ premake.override(vc2010.elements, "globals", function(base, prj)
 			android.applicationTypeRevision,
 		})
 	else
-		base(prj)
+		return base(prj)
 	end
 end)
 
