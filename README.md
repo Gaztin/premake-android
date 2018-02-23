@@ -20,8 +20,8 @@ project "Application"
 		"src/**.h",
 		"src/**.cpp",
 	}
-	linkoptions {
-		"-lEGL",
+	links {
+		"EGL",
 	}
 
 project "Application.Packaging"
@@ -29,6 +29,6 @@ project "Application.Packaging"
 	kind "Packaging"
 	system "android"
 	files {
-		"assets/**",
+		"data/**",
 	}
 ```
