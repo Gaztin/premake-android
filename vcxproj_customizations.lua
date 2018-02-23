@@ -117,6 +117,22 @@ premake.override(vc2010, "exceptionHandling", function(base, cfg)
 	end
 end)
 
+premake.override(vc2010, "outDir", function(base, cfg)
+	if cfg.system == android._ANDROID and android.isApp(cfg.kind) or android.isPackaging(cfg.kind) then
+		vc2010.element("OutDir", nil, "$(ProjectDir)$(Platform)\\$(Configuration)\\$(RootNamespace)\\")
+	else
+		base(cfg)
+	end
+end)
+
+premake.override(vc2010, "intDir", function(base, cfg)
+	if cfg.system == android._ANDROID and android.isApp(cfg.kind) or android.isPackaging(cfg.kind) then
+		vc2010.element("IntDir", nil, "$(ProjectDir)$(Platform)\\$(Configuration)\\$(RootNamespace)\\")
+	else
+		base(cfg)
+	end
+end)
+
 premake.override(vc2010, "targetName", function(base, cfg)
 	if cfg.system ~= android._ANDROID or not android.isApp(cfg.kind) and not android.isPackaging(cfg.kind) then
 		base(cfg)
