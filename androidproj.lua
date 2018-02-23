@@ -227,7 +227,8 @@ function androidproj.antPackage(cfg)
 	local dependent_prj = androidproj.getDependentProject(cfg.project)
 
 	premake.push("<AntPackage>")
-	premake.w("<AndroidAppLibName>%s</AndroidAppLibName>", dependent_prj.name)
+	vc2010.element("AndroidAppLibName", nil, dependent_prj.name)
+	vc2010.element("ApplicationName", nil, cfg.targetname)
 	premake.pop("</AntPackage>")
 end
 
