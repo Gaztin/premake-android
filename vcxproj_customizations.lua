@@ -117,6 +117,12 @@ premake.override(vc2010, "exceptionHandling", function(base, cfg)
 	end
 end)
 
+premake.override(vc2010, "targetName", function(base, cfg)
+	if cfg.system ~= android._ANDROID or not android.isApp(cfg.kind) and not android.isPackaging(cfg.kind) then
+		base(cfg)
+	end
+end)
+
 --
 -- Element functions
 --

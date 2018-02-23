@@ -180,7 +180,7 @@ androidproj.elements.outputProperties = function(cfg)
 	return {
 		vc2010.outDir,
 		vc2010.intDir,
-		androidproj.targetName,
+		vc2010.targetName,
 		androidproj.targetExt,
 	}
 end
@@ -195,10 +195,6 @@ function androidproj.outputPropertiesGroup(prj)
 	for cfg in premake.project.eachconfig(prj) do
 		androidproj.outputProperties(cfg)
 	end
-end
-
-function androidproj.targetName(cfg)
-	vc2010.element("TargetName", nil, "$(RootNamespace)")
 end
 
 function androidproj.targetExt(cfg)
