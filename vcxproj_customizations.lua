@@ -21,8 +21,28 @@ premake.override(vc2010.elements, "globals", function(base, prj)
 	end
 end)
 
+function android.keyword(prj)
+	vc2010.element("Keyword", nil, "Android")
+end
+
+function android.rootNamespace(prj)
+	vc2010.element("RootNamespace", nil, prj.name)
+end
+
+function android.defaultLanguage(prj)
+	vc2010.element("DefaultLanguage", nil, "en-US")
+end
+
+function android.applicationType(prj)
+	vc2010.element("ApplicationType", nil, "Android")
+end
+
+function android.applicationTypeRevision(prj)
+	vc2010.element("ApplicationTypeRevision", nil, "3.0")
+end
+
 --
--- Configuration
+-- Configuration properties
 --
 
 premake.override(vc2010.elements, "configurationProperties", function(base, cfg)
@@ -35,19 +55,6 @@ premake.override(vc2010.elements, "configurationProperties", function(base, cfg)
 	end
 end)
 
-premake.override(vc2010, "additionalDependencies", function(base, cfg, explicit)
-	if cfg.system == android._ANDROID then
-		local links = premake.config.getlinks(cfg, "system", "fullpath")
-		
-		if #links > 0 then
-			links = path.translate(table.concat(links, ";"))
-			vc2010.element("LibraryDependencies", nil, "%s;%%(LibraryDependencies)", links);
-		end
-	else
-		base(cfg, explicit)
-	end
-end)
-
 premake.override(vc2010, "configurationType", function(base, cfg)
 	if cfg.system == android._ANDROID and android.isApp(cfg.kind) then
 		vc2010.element("ConfigurationType", nil, "DynamicLibrary")
@@ -57,135 +64,126 @@ premake.override(vc2010, "configurationType", function(base, cfg)
 end)
 
 premake.override(vc2010, "platformToolset", function(base, cfg)
+	-- Select toolset for android projects. Default to clang
 	if cfg.system == android._ANDROID then
-		vc2010.element("PlatformToolset", nil, "Clang_3_8")
+		local toolset = cfg.toolset:explode("-", true, 1)
+		if toolset[1] == "gcc" then
+			vc2010.element("PlatformToolset", nil, "Gcc_4_9")
+		else
+			vc2010.element("PlatformToolset", nil, "Clang_3_8")
+		end
 	else
 		base(cfg)
 	end
 end)
 
 premake.override(vc2010, "windowsSDKDesktopARMSupport", function(base, cfg)
+	-- ARM platforms shouldn't trigger insertion of 'WindowsSDKDesktopARMSupport' in android projects
 	if cfg.system ~= android._ANDROID then
 		base(cfg)
 	end
 end)
 
-premake.override(vc2010, "targetExt", function(base, cfg)
-	if cfg.system ~= android._ANDROID then
-		base(cfg)
-	else
-		if android.isApp(cfg.kind) or cfg.kind == "SharedLib" then
-			vc2010.element("TargetExt", nil, ".so")
-		elseif cfg.kind == "StaticLib" then
-			vc2010.element("TargetExt", nil, ".a")
-		end
-	end
-end)
+function android.androidApiLevel(cfg)
+	-- Custom android API level. Default to Android-19
+	local apilevel = cfg.androidapilevel or "android-19"
+	vc2010.element("AndroidAPILevel", nil, apilevel)
+end
 
-premake.override(vc2010, "debugInformationFormat", function(base, cfg)
-	if cfg.system ~= android._ANDROID then
-		base(cfg)
-	end
-end)
+--
+-- Output properties
+--
 
-premake.override(vc2010, "subSystem", function(base, cfg)
-	if cfg.system ~= android._ANDROID then
-		base(cfg)
-	end
-end)
-
-premake.override(vc2010, "importLibrary", function(base, cfg)
-	if cfg.system ~= android._ANDROID then
-		base(cfg)
-	end
-end)
-
-premake.override(vc2010, "generateDebugInformation", function(base, cfg)
-	if cfg.system ~= android._ANDROID then
-		base(cfg)
-	end
-end)
-
-premake.override(vc2010, "warningLevel", function(base, cfg)
+premake.override(vc2010.elements, "outputProperties", function(base, cfg)
 	if cfg.system == android._ANDROID then
-		local map = { Off = "TurnOffAllWarnings", Extra = "EnableAllWarnings" }
-		vc2010.element("WarningLevel", nil, map[cfg.warnings] or "TurnOffAllWarnings")
+		return table.join(base(cfg), {
+			android.useMultiToolTask,
+		})
 	else
-		base(cfg)
-	end
-end)
-
-premake.override(vc2010, "exceptionHandling", function(base, cfg)
-	if cfg.system == android._ANDROID then
-		if cfg.exceptionhandling == premake.OFF then
-			vc2010.element("ExceptionHandling", nil, "Disabled")
-		elseif cfg.exceptionhandling == "On" then
-			vc2010.element("ExceptionHandling", nil, "Enabled")
-		end
-	else
-		base(cfg)
+		return base(cfg)
 	end
 end)
 
 premake.override(vc2010, "outDir", function(base, cfg)
-	if cfg.system == android._ANDROID and android.isApp(cfg.kind) or android.isPackaging(cfg.kind) then
-		vc2010.element("OutDir", nil, "$(ProjectDir)$(Platform)\\$(Configuration)\\$(RootNamespace)\\")
+	-- Target directory for android projects has to be an absolute path
+	if cfg.system == android._ANDROID then
+		vc2010.element("OutDir", nil, cfg.targetdir .. "/")
 	else
 		base(cfg)
 	end
 end)
 
 premake.override(vc2010, "intDir", function(base, cfg)
-	if cfg.system == android._ANDROID and android.isApp(cfg.kind) or android.isPackaging(cfg.kind) then
-		vc2010.element("IntDir", nil, "$(ProjectDir)$(Platform)\\$(Configuration)\\$(RootNamespace)\\")
+	-- Intermediate directory for android projects has to be an absolute path
+	if cfg.system == android._ANDROID then
+		vc2010.element("IntDir", nil, cfg.objdir .. "/")
 	else
 		base(cfg)
 	end
 end)
 
 premake.override(vc2010, "targetName", function(base, cfg)
-	if cfg.system ~= android._ANDROID or not android.isApp(cfg.kind) and not android.isPackaging(cfg.kind) then
+	-- Target names in android application projects have to start with 'lib'
+	if cfg.system == android._ANDROID and android.isApp(cfg.kind) then
+		vc2010.element("TargetName", nil, "lib" .. cfg.targetname)
+	else
+		base(cfg)
+	end
+end)
+
+function android.useMultiToolTask(cfg)
+	-- Android equivalent of 'MultiProcessorCompilation'
+	if cfg.flags.MultiProcessorCompile then
+		vc2010.element("UseMultiToolTask", nil, "true")
+	end
+end
+
+--
+-- ClCompile
+--
+
+premake.override(vc2010, "warningLevel", function(base, cfg)
+	-- In android projects you either enable all warnings or turn them all off
+	if cfg.system == android._ANDROID then
+		local map = {
+			Off = "TurnOffAllWarnings",
+			Extra = "EnableAllWarnings"
+		}
+		vc2010.element("WarningLevel", nil, map[cfg.warnings] or map.Off)
+	else
 		base(cfg)
 	end
 end)
 
 --
--- Element functions
+-- Link
 --
 
-function android.keyword(prj)
-	if prj.system == android._ANDROID then
-		vc2010.element("Keyword", nil, "Android")
+premake.override(vc2010, "subSystem", function(base, cfg)
+	-- Ignore android projects since they don't use subsystems
+	if cfg.system ~= android._ANDROID then
+		base(cfg)
 	end
-end
+end)
 
-function android.rootNamespace(prj)
-	if prj.system == android._ANDROID then
-		vc2010.element("RootNamespace", nil, prj.name)
+premake.override(vc2010, "importLibrary", function(base, cfg)
+	-- Ignore android projects since they don't use import libraries
+	if cfg.system ~= android._ANDROID then
+		base(cfg)
 	end
-end
+end)
 
-function android.defaultLanguage(prj)
-	if prj.system == android._ANDROID then
-		vc2010.element("DefaultLanguage", nil, "en-US")
-	end
-end
-
-function android.applicationType(prj)
-	if prj.system == android._ANDROID then
-		vc2010.element("ApplicationType", nil, "Android")
-	end
-end
-
-function android.applicationTypeRevision(prj)
-	if prj.system == android._ANDROID then
-		vc2010.element("ApplicationTypeRevision", nil, "3.0")
-	end
-end
-
-function android.androidApiLevel(cfg)
+premake.override(vc2010, "exceptionHandling", function(base, cfg)
+	-- Android projects use a different value scheme for exception handling
 	if cfg.system == android._ANDROID then
-		local apiLevel = cfg.androidapilevel or android._DEFAULT_API_LEVEL
-		vc2010.element("AndroidAPILevel", nil, apiLevel)
+		local map = {
+			Default = "Disabled",
+			On = "Enabled",
+			Off = "Disabled",
+			SEH = "Enabled",
+		}
+		vc2010.element("ExceptionHandling", nil, map[cfg.exceptionhandling] or map.Default)
+	else
+		base(cfg)
 	end
-end
+end)
