@@ -155,6 +155,20 @@ premake.override(vc2010, "warningLevel", function(base, cfg)
 	end
 end)
 
+premake.override(vc2010, "debugInformationFormat", function(base, cfg)
+	-- Android projects have a different value scheme for debug information format
+	if cfg.system == android._ANDROID then
+		local map = {
+			Default = "LineNumber",
+			Off = "None",
+			Full = "FullDebug",
+		}
+		vc2010.element("DebugInformationFormat", nil, map[cfg.symbols] or map.Default)
+	else
+		base(cfg)
+	end
+end)
+
 --
 -- Link
 --
