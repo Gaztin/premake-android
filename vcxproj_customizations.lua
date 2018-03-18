@@ -187,6 +187,13 @@ premake.override(vc2010, "importLibrary", function(base, cfg)
 	end
 end)
 
+premake.override(vc2010, "generateDebugInformation", function(base, cfg)
+	-- Ignore android projects since they don't use generate debug information
+	if cfg.system ~= android._ANDROID then
+		base(cfg)
+	end
+end)
+
 premake.override(vc2010, "exceptionHandling", function(base, cfg)
 	-- Android projects use a different value scheme for exception handling
 	if cfg.system == android._ANDROID then
