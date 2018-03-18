@@ -169,6 +169,13 @@ premake.override(vc2010, "debugInformationFormat", function(base, cfg)
 	end
 end)
 
+premake.override(vc2010, "multiProcessorCompilation", function(base, cfg)
+	-- Ignore android projects since they use an alternate keyword and in a different properties group.
+	if cfg.system ~= android._ANDROID then
+		base(cfg)
+	end
+end)
+
 --
 -- Link
 --
