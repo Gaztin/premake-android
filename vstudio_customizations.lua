@@ -9,21 +9,6 @@ local vs2010 = vstudio.vs2010
 --
 
 premake.override(vs2010, "generateProject", function(base, prj)
-	if prj.system == android._ANDROID and android.isApp(prj.kind) then
-		-- Go through all the packaging projects in the workspace to find one that depends on this application project
-		for p in premake.workspace.eachproject(prj.workspace) do
-			if p.system == android._ANDROID and android.isPackaging(p.kind) then
-				local dependent_prj = android.androidproj.getDependentProject(p)
-				if dependent_prj == prj then
-					-- If it found one, insert the asset copying post-build event
-					for cfg in premake.project.eachconfig(prj) do
-						table.insert(cfg["postbuildcommands"], "if exist \"$(LocalDebuggerWorkingDirectory)\\data\\\" xcopy /sy \"$(LocalDebuggerWorkingDirectory)\\data\" \"" .. p.location .. "/Assets\"")
-					end
-				end
-			end
-		end
-	end
-
 	if prj.system == android._ANDROID and android.isPackaging(prj.kind) then
 		premake.eol("\r\n")
 		premake.indent("  ")
