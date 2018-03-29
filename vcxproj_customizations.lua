@@ -49,6 +49,7 @@ premake.override(vc2010.elements, "configurationProperties", function(base, cfg)
 	if cfg.system == android._ANDROID then
 		return table.join(base(cfg), {
 			android.androidApiLevel,
+			android.useOfStl,
 		})
 	else
 		return base(cfg)
@@ -88,6 +89,11 @@ function android.androidApiLevel(cfg)
 	-- Custom android API level. Default to Android-19
 	local apilevel = cfg.androidapilevel or "android-19"
 	vc2010.element("AndroidAPILevel", nil, apilevel)
+end
+
+function android.useOfStl(cfg)
+	-- Explicitly use the static GNU STL library
+	vc2010.element("UseOfStl", nil, "gnustl_static")
 end
 
 --
